@@ -1,0 +1,311 @@
+﻿@model ClassChatViewModel
+@using System.Security.Claims
+
+@{
+    var currentUserId = User.FindFirst(ClaimTypes.NameIdentifier)?.Value;
+    var isTeacher = Model.Members.Any(m => m.UserId.ToString() == currentUserId && m.RoleInClass == "teacher");
+}
+
+<div class="container mt-4">
+    <div class="row" style="height: 100%;">
+        <!-- Левая часть: чат -->
+        <div class="col-md-9 d-flex flex-column">
+            <div class="card shadow rounded flex-grow-1 d-flex flex-column">
+                <div class="card-header bg-primary text-white d-flex justify-content-between align-items-center">
+                    <h5 class="mb-0">Чат класса: @Model.ClassName</h5>
+                </div>
+
+                <div id="chatContainer" class="card-body overflow-auto" style="background-color: #f8f9fa; flex-grow: 1; max-height: 70vh;">
+                    @if (!Model.Messages.Any())
+                    {
+                        <div class="d-flex justify-content-center align-items-center h-100 text-muted">
+                            <div class="text-center">
+                                <i class="bi bi-chat-dots" style="font-size: 2rem;"></i>
+                                <p class="mt-2">Пока сообщений нет. Начните общение!</p>
+                            </div>
+                        </div>
+                    }
+                    else
+                    {
+                        foreach (var msg in Model.Messages)
+                        {
+                            var isMine = msg.SenderId.ToString() == currentUserId;
+
+                            if (msg.IsAnnouncement)
+                            {
+                                <div class="d-flex justify-content-center mb-3">
+                                    <div class="announcement-box text-center shadow-sm">
+                                        <div class="fw-bold text-white bg-warning py-1 px-3 rounded-top">📣 Объявление</div>
+                                        <div class="px-3 py-2 bg-white text-dark rounded-bottom">
+                                            <div>@msg.Content</div>
+                                            <div class="text-muted small mt-1">@msg.CreatedAt.ToLocalTime().ToString("HH:mm")</div>
+                                        </div>
+                                    </div>
+                                </div>
+                            }
+                            else if (isMine)
+                            {
+                                <div class="d-flex justify-content-end mb-2">
+                                    <div class="p-2 rounded shadow-sm bg-success text-white" style="max-width: 60%; border-radius: 12px;">
+                                        <div class="fw-bold small">@msg.Sender?.FullName</div>
+                                        <div>@msg.Content</div>
+                                        <div class="text-muted small text-end">@msg.CreatedAt.ToLocalTime().ToString("HH:mm")</div>
+                                    </div>
+                                </div>
+                            }
+                            else
+                            {
+                                <div class="d-flex justify-content-start mb-2">
+                                    <div class="p-2 rounded shadow-sm bg-light" style="max-width: 60%; border-radius: 12px;">
+                                        <div class="fw-bold small">@msg.Sender?.FullName</div>
+                                        <div>@msg.Content</div>
+                                        <div class="text-muted small text-end">@msg.CreatedAt.ToLocalTime().ToString("HH:mm")</div>
+                                    </div>
+                                </div>
+                            }
+                        }
+                    }
+                </div>
+
+                <div class="card-footer bg-white border-top">
+                    <form id="chatForm" class="d-flex">
+                        <input type="hidden" id="isAnnouncement" value="false" />
+                        <textarea id="chatInput" class="form-control me-2" rows="1" placeholder="Введите сообщение..." style="resize: none;"></textarea>
+                        <button type="submit" class="btn btn-primary">➤</button>
+                    </form>
+
+                    @if (isTeacher)
+                    {
+                        <button type="button" class="btn btn-warning mt-2" id="announcementButton">
+                            Сделать объявление
+                        </button>
+                    }
+                </div>
+            </div>
+        </div>
+
+        <!-- Правая часть: участники -->
+        <div class="col-md-3">
+            <div class="card shadow rounded h-100 d-flex flex-column">
+                <div class="card-header bg-light d-flex justify-content-between align-items-center">
+                    <h6 class="mb-0">Участники</h6>
+                    @if (isTeacher)
+                    {
+                        <button class="btn btn-sm btn-outline-primary" data-bs-toggle="modal" data-bs-target="#inviteModal">
+                            <i class="bi bi-person-plus"></i>
+                        </button>
+                    }
+                </div>
+                <div class="card-body overflow-auto" style="max-height: calc(80vh - 56px);">
+                    @foreach (var member in Model.Members)
+                    {
+                        <li class="list-group-item d-flex justify-content-between align-items-center">
+                            <div class="d-flex align-items-center">
+                                <i class="bi bi-person-circle me-2"></i>
+                                <div>
+                                    <div>@member.User?.FullName</div>
+                                    <small class="text-muted">@member.RoleInClass</small>
+                                </div>
+                            </div>
+
+                            @if (isTeacher && member.UserId.ToString() != currentUserId)
+                            {
+                                <button class="btn btn-sm btn-outline-danger remove-member"
+                                        data-user-id="@member.UserId">
+                                    <i class="bi bi-trash"></i>
+                                </button>
+                            }
+                        </li>
+                    }
+                    </ul>
+                </div>
+                @{
+                    var userRole = User.FindFirst(ClaimTypes.Role)?.Value;
+                    var showDiscussionButton = userRole == "teacher" || userRole == "parent";
+                }
+
+                @if (showDiscussionButton)
+                {
+                    <div class="card-header bg-primary text-white d-flex justify-content-between align-items-center">
+                        <h5 class="mb-0">Чат класса: @Model.ClassName</h5>
+                        <a asp-controller="Discussion" asp-action="List" asp-route-classId="@Model.ClassId"
+                           class="btn btn-sm btn-light">
+                            <i class="bi bi-chat-square-text"></i> Обсуждения
+                        </a>
+                    </div>
+                }
+                else
+                {
+                    <div class="card-header bg-primary text-white">
+                        <h5 class="mb-0">Чат класса: @Model.ClassName</h5>
+                    </div>
+                }
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- TOAST уведомления -->
+<div class="position-fixed bottom-0 end-0 p-3" style="z-index: 11">
+    <div class="toast align-items-center text-white bg-success border-0" id="toastSuccess" role="alert">
+        <div class="d-flex">
+            <div class="toast-body">@TempData["Success"]</div>
+            <button type="button" class="btn-close btn-close-white me-2 m-auto" data-bs-dismiss="toast"></button>
+        </div>
+    </div>
+    <div class="toast align-items-center text-white bg-danger border-0" id="toastError" role="alert">
+        <div class="d-flex">
+            <div class="toast-body">@TempData["Error"]</div>
+            <button type="button" class="btn-close btn-close-white me-2 m-auto" data-bs-dismiss="toast"></button>
+        </div>
+    </div>
+</div>
+
+<!-- Модалка добавления участника -->
+@if (isTeacher)
+{
+    <div class="modal fade" id="inviteModal" tabindex="-1" aria-labelledby="inviteModalLabel" aria-hidden="true">
+        <div class="modal-dialog">
+            <form method="post" asp-action="AddMember" asp-controller="Teacher">
+                <input type="hidden" name="classId" value="@Model.ClassId" />
+                <div class="modal-content">
+                    <div class="modal-header">
+                        <h5 class="modal-title">Добавить участника</h5>
+                        <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+                    </div>
+                    <div class="modal-body">
+                        <label class="form-label">Email участника</label>
+                        <input type="email" class="form-control" name="email" required placeholder="example@domain.com" />
+                    </div>
+                    <div class="modal-footer">
+                        <button type="submit" class="btn btn-primary">Добавить</button>
+                    </div>
+                </div>
+            </form>
+        </div>
+    </div>
+}
+
+@section Scripts {
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/microsoft-signalr/7.0.5/signalr.min.js"></script>
+    <script>
+                document.querySelectorAll('.remove-member').forEach(btn => {
+            btn.addEventListener('click', async function() {
+                if (!confirm('Удалить участника из класса?')) return;
+
+                const userId = this.dataset.userId;
+                const classId = '@Model.ClassId';
+
+                try {
+                    const response = await fetch('/Teacher/RemoveMember', {
+                        method: 'POST',
+                        headers: {
+                            'Content-Type': 'application/json',
+                            'RequestVerificationToken': document.querySelector('input[name="__RequestVerificationToken"]').value
+                        },
+                        body: JSON.stringify({
+                            classId: classId,
+                            userId: userId
+                        })
+                    });
+
+                    if (!response.ok) {
+                        throw new Error('Ошибка сети');
+                    }
+
+                    const result = await response.json();
+
+                    if (result.success) {
+                        this.closest('li').remove();
+                        const toast = new bootstrap.Toast(document.getElementById('toastSuccess'));
+                        document.querySelector('#toastSuccess .toast-body').textContent = 'Участник удалён';
+                        toast.show();
+                    } else {
+                        throw new Error(result.error || 'Неизвестная ошибка');
+                    }
+                } catch (error) {
+                    console.error('Ошибка:', error);
+                    const toast = new bootstrap.Toast(document.getElementById('toastError'));
+                    document.querySelector('#toastError .toast-body').textContent = error.message;
+                    toast.show();
+                }
+            });
+        });
+        const chatContainer = document.getElementById("chatContainer");
+        const currentUserId = "@User.FindFirst(ClaimTypes.NameIdentifier)?.Value";
+
+        const connection = new signalR.HubConnectionBuilder()
+            .withUrl("/hubs/chat?classId=@Model.ClassId")
+            .build();
+
+        connection.on("ReceiveClassMessage", (msg) => {
+            const isMine = msg.sender.id === currentUserId;
+            let html = "";
+
+            if (msg.isAnnouncement) {
+                html = `
+                    <div class="d-flex justify-content-center mb-2">
+                        <div class="p-3 rounded shadow-sm bg-warning-subtle border border-warning text-center"
+                             style="max-width: 70%; border-radius: 12px;">
+                            <div class="fw-bold text-warning">📢 Объявление</div>
+                            <div>${msg.content}</div>
+                            <div class="text-muted small">${new Date(msg.createdAt).toLocaleTimeString([], {hour: '2-digit', minute:'2-digit'})}</div>
+                        </div>
+                    </div>
+                `;
+            } else {
+                html = `
+                    <div class="d-flex ${isMine ? "justify-content-end" : "justify-content-start"} mb-2">
+                        <div class="p-2 rounded shadow-sm ${isMine ? "bg-success text-white" : "bg-light"}"
+                             style="max-width: 60%; border-radius: 12px;">
+                            <div class="fw-bold small">${msg.sender.fullName}</div>
+                            <div>${msg.content}</div>
+                            <div class="text-muted small text-end">${new Date(msg.createdAt).toLocaleTimeString([], {hour: '2-digit', minute:'2-digit'})}</div>
+                        </div>
+                    </div>
+                `;
+            }
+
+            const wrapper = document.createElement("div");
+            wrapper.innerHTML = html;
+            chatContainer.appendChild(wrapper);
+            chatContainer.scrollTop = chatContainer.scrollHeight;
+        });
+
+        connection.start().then(() => {
+            chatContainer.scrollTop = chatContainer.scrollHeight;
+        }).catch(err => console.error(err));
+
+        document.getElementById("chatForm").addEventListener("submit", async (e) => {
+            e.preventDefault();
+            const input = document.getElementById("chatInput");
+            const content = input.value.trim();
+            const isAnnouncement = document.getElementById("isAnnouncement").value === "true";
+            if (!content) return;
+
+            await connection.invoke("SendClassMessage", "@Model.ClassId", currentUserId, content, isAnnouncement);
+            input.value = "";
+            document.getElementById("isAnnouncement").value = "false";
+        });
+
+        document.getElementById("announcementButton")?.addEventListener("click", () => {
+            document.getElementById("isAnnouncement").value = "true";
+        });
+
+        const showToast = (id) => {
+            const toastEl = document.getElementById(id);
+            if (toastEl && toastEl.querySelector(".toast-body").innerText.trim() !== "") {
+                const toast = new bootstrap.Toast(toastEl);
+                toast.show();
+            }
+        };
+
+        showToast("toastSuccess");
+        showToast("toastError");
+    </script>
+}
+
+
+
+
+

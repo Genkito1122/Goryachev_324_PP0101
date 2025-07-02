@@ -1,0 +1,49 @@
+﻿@model Proekt.Models.DiscussionViewModel
+@using System.Linq
+@{
+    ViewData["Title"] = "Обсуждение";
+}
+
+<div class="container mt-4">
+    <div class="card shadow-sm">
+        <div class="card-header bg-primary text-white">
+            <h5 class="mb-0"><i class="bi bi-chat-left-text me-2"></i>@Model.Discussion.Title</h5>
+        </div>
+
+        <div class="card-body" style="background-color: #f9f9f9;">
+            @if (!Model.Comments.Any())
+            {
+                <div class="alert alert-secondary">Нет комментариев. Будьте первым!</div>
+            }
+
+            @foreach (var comment in Model.Comments)
+            {
+                <div class="mb-3 p-3 bg-white border rounded shadow-sm">
+                    <div class="d-flex justify-content-between">
+                        <div>
+                            <strong>@comment.Sender?.FullName</strong>
+                        </div>
+                        <small class="text-muted">@comment.CreatedAt.ToLocalTime().ToString("g")</small>
+                    </div>
+                    <div class="mt-2">@comment.Content</div>
+                </div>
+            }
+
+            <hr />
+
+            <form method="post" asp-action="PostComment">
+                <input type="hidden" name="discussionId" value="@Model.Discussion.Id" />
+                <div class="mb-3">
+                    <label class="form-label">Ваш комментарий</label>
+                    <textarea name="content" class="form-control" rows="3" required placeholder="Напишите что-нибудь..."></textarea>
+                </div>
+                <button type="submit" class="btn btn-primary">
+                    <i class="bi bi-reply-fill"></i> Ответить
+                </button>
+                <a asp-action="List" asp-route-classId="@Model.Discussion.ClassId" class="btn btn-outline-secondary ms-2">
+                    <i class="bi bi-arrow-left"></i> Назад
+                </a>
+            </form>
+        </div>
+    </div>
+</div>

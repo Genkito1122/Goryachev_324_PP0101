@@ -1,0 +1,78 @@
+﻿@model IEnumerable<Proekt.Models.Class>
+@{
+    ViewData["Title"] = "Ваши классы";
+}
+
+<div class="container mt-4">
+    <div class="d-flex justify-content-between align-items-center mb-4">
+        <h2 class="mb-0">
+            <i class="bi bi-people-fill text-primary me-2"></i>Ваши классы
+        </h2>
+        <a asp-action="CreateClass" class="btn btn-primary">
+            <i class="bi bi-plus-circle"></i> Создать новый класс
+        </a>
+    </div>
+
+    @if (Model.Any())
+    {
+        <div class="row row-cols-1 row-cols-md-2 row-cols-lg-3 g-4">
+            @foreach (var cls in Model)
+            {
+                <div class="col">
+                    <div class="card h-100 shadow-sm class-card">
+                        <div class="card-body">
+                            <div class="d-flex justify-content-between align-items-start">
+                                <h5 class="card-title mb-3">
+                                    <i class="bi bi-collection text-secondary me-2"></i>@cls.Name
+                                </h5>
+                                <span class="badge bg-info">ID: @cls.Id.ToString()[..8]...</span>
+                            </div>
+                            <div class="d-flex justify-content-between align-items-center">
+                                <span class="text-muted small">
+                                    <i class="bi bi-calendar3"></i> @cls.CreatedAt.ToString("dd.MM.yyyy")
+                                </span>
+                                <a asp-controller="Teacher" asp-action="Chat" asp-route-classId="@cls.Id"
+                                   class="btn btn-sm btn-outline-primary">
+                                    <i class="bi bi-chat-left-text"></i> Перейти в чат
+                                </a>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            }
+        </div>
+    }
+    else
+    {
+        <div class="alert alert-info d-flex align-items-center" role="alert">
+            <i class="bi bi-info-circle-fill me-2"></i>
+            <div>
+                У вас пока нет созданных классов. Нажмите "Создать новый класс" чтобы начать.
+            </div>
+        </div>
+    }
+</div>
+
+@section Styles {
+    <style>
+        .class-card {
+            transition: transform 0.2s ease, box-shadow 0.2s ease;
+            border-radius: 10px;
+            border: none;
+        }
+
+            .class-card:hover {
+                transform: translateY(-5px);
+                box-shadow: 0 10px 20px rgba(0, 0, 0, 0.1);
+            }
+
+        .card-title {
+            color: #2c3e50;
+            font-weight: 600;
+        }
+
+        .btn-outline-primary {
+            transition: all 0.2s ease;
+        }
+    </style>
+}

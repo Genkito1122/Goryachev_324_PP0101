@@ -1,0 +1,54 @@
+﻿@{
+    ViewData["Title"] = "Создание нового класса";
+}
+
+@if (TempData["Error"] != null)
+{
+    <div class="alert alert-danger alert-dismissible fade show" role="alert">
+        @TempData["Error"]
+        <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+    </div>
+}
+
+@if (TempData["Success"] != null)
+{
+    <div class="alert alert-success alert-dismissible fade show" role="alert">
+        @TempData["Success"]
+        <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+    </div>
+}
+
+    <form asp-action="CreateClass" method="post" class="mt-4">
+        @Html.AntiForgeryToken()
+        
+        <div class="form-group mb-3">
+            <label for="className" class="form-label">Название класса</label>
+            <input type="text" name="className" id="className" 
+                   class="form-control" placeholder="Например: 9А, Математика" 
+                   required minlength="2" maxlength="50" />
+        </div>
+        
+        <div class="d-flex gap-2">
+            <button type="submit" class="btn btn-primary">
+                <i class="bi bi-plus-circle"></i> Создать
+            </button>
+            <a asp-action="Dashboard" class="btn btn-outline-secondary">
+                <i class="bi bi-arrow-left"></i> Назад
+            </a>
+        </div>
+    </form>
+</div>
+
+
+@section Scripts {
+    <script>
+        // Проверка формы на клиенте
+        document.querySelector('form').addEventListener('submit', function(e) {
+            const input = document.getElementById('className');
+            if (input.value.trim().length < 2) {
+                e.preventDefault();
+                alert('Название класса должно содержать минимум 2 символа');
+            }
+        });
+    </script>
+}

@@ -1,0 +1,219 @@
+﻿<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>@ViewData["Title"] - Шкила</title>
+    <link rel="stylesheet" href="~/lib/bootstrap/dist/css/bootstrap.min.css" />
+    <link rel="stylesheet" href="~/css/site.css" asp-append-version="true" />
+    <link rel="stylesheet" href="~/Proekt.styles.css" asp-append-version="true" />
+    <link href="https://fonts.googleapis.com/css2?family=Roboto+Condensed:wght@400;700&family=Open+Sans:wght@400;600&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet">
+
+</head>
+<body>
+    <div class="auth-layout-container">
+        <main role="main">
+            @RenderBody()
+        </main>
+    </div>
+
+    <footer class="auth-footer">
+        <div class="container">
+            &copy; @DateTime.Now.Year - Шкила
+        </div>
+    </footer>
+    <style>
+        :root {
+            --edu-primary: #3F72AF;
+            --edu-primary-light: #5B8CE2;
+            --edu-secondary: #112D4E;
+            --edu-accent: #DBE2EF;
+            --edu-white: #FFFFFF;
+            --edu-bg: #F9F7F7;
+            --edu-text: #333333;
+            --edu-border: #E0E0E0;
+            --edu-error: #FF5252;
+            --edu-success: #4CAF50;
+        }
+
+        body {
+            background-color: var(--edu-bg);
+            font-family: 'Open Sans', 'Segoe UI', Roboto, sans-serif;
+            color: var(--edu-text);
+            line-height: 1.6;
+        }
+
+        .auth-layout-container {
+            display: flex;
+            flex-direction: column;
+            min-height: 100vh;
+        }
+
+        .auth-container {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            flex-grow: 1;
+            padding: 2rem;
+            background: linear-gradient(135deg, var(--edu-accent) 0%, var(--edu-bg) 100%);
+        }
+
+        .auth-card {
+            background-color: var(--edu-white);
+            border-radius: 12px;
+            box-shadow: 0 8px 24px rgba(0, 0, 0, 0.1);
+            width: 100%;
+            max-width: 480px;
+            overflow: hidden;
+            transition: transform 0.3s ease, box-shadow 0.3s ease;
+        }
+
+            .auth-card:hover {
+                transform: translateY(-5px);
+                box-shadow: 0 12px 28px rgba(0, 0, 0, 0.15);
+            }
+
+        .auth-header {
+            background-color: var(--edu-primary);
+            color: var(--edu-white);
+            padding: 1.5rem 2rem;
+            text-align: center;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 0.5rem;
+        }
+
+            .auth-header .material-icons {
+                font-size: 2.5rem;
+            }
+
+            .auth-header h2 {
+                margin: 0;
+                font-weight: 600;
+                font-family: 'Roboto Condensed', sans-serif;
+            }
+
+        .auth-form {
+            padding: 2rem;
+        }
+
+        .form-group {
+            margin-bottom: 1.5rem;
+        }
+
+        .form-label {
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            margin-bottom: 0.5rem;
+            font-weight: 600;
+            color: var(--edu-secondary);
+        }
+
+            .form-label .material-icons {
+                font-size: 1.2rem;
+                color: var(--edu-primary);
+            }
+
+        .form-control {
+            width: 100%;
+            padding: 0.75rem 1rem;
+            border: 1px solid var(--edu-border);
+            border-radius: 8px;
+            font-size: 1rem;
+            transition: border-color 0.3s ease, box-shadow 0.3s ease;
+        }
+
+            .form-control:focus {
+                border-color: var(--edu-primary-light);
+                box-shadow: 0 0 0 3px rgba(63, 114, 175, 0.2);
+                outline: none;
+            }
+
+            .form-control::placeholder {
+                color: #999;
+            }
+
+        select.form-control {
+            appearance: none;
+            background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='24' height='24' viewBox='0 0 24 24' fill='none' stroke='%233F72AF' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpolyline points='6 9 12 15 18 9'%3E%3C/polyline%3E%3C/svg%3E");
+            background-repeat: no-repeat;
+            background-position: right 0.75rem center;
+            background-size: 1rem;
+        }
+
+        .btn-auth {
+            width: 100%;
+            padding: 0.75rem;
+            border-radius: 8px;
+            font-weight: 600;
+            font-size: 1rem;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 0.5rem;
+            transition: all 0.3s ease;
+            border: none;
+        }
+
+        .btn-primary.btn-auth {
+            background-color: var(--edu-primary);
+        }
+
+            .btn-primary.btn-auth:hover {
+                background-color: var(--edu-secondary);
+                transform: translateY(-2px);
+            }
+
+        .form-actions {
+            margin: 2rem 0 1.5rem;
+        }
+
+        .auth-footer {
+            text-align: center;
+            padding-top: 1rem;
+            border-top: 1px solid var(--edu-border);
+            color: #666;
+        }
+
+            .auth-footer a {
+                color: var(--edu-primary);
+                font-weight: 600;
+                text-decoration: none;
+                transition: color 0.3s ease;
+            }
+
+                .auth-footer a:hover {
+                    color: var(--edu-secondary);
+                    text-decoration: underline;
+                }
+
+        .validation-error {
+            color: var(--edu-error);
+            font-size: 0.875rem;
+            margin-top: 0.25rem;
+            display: block;
+        }
+
+        .alert {
+            padding: 0.75rem 1.25rem;
+            margin-bottom: 1.5rem;
+            border-radius: 8px;
+            font-size: 0.875rem;
+        }
+
+        .alert-success {
+            background-color: rgba(76, 175, 80, 0.1);
+            border: 1px solid rgba(76, 175, 80, 0.2);
+            color: var(--edu-success);
+        }
+    </style>
+
+    <script src="~/lib/jquery/dist/jquery.min.js"></script>
+    <script src="~/lib/bootstrap/dist/js/bootstrap.bundle.min.js"></script>
+    <script src="~/js/site.js" asp-append-version="true"></script>
+    @await RenderSectionAsync("Scripts", required: false)
+</body>
+</html>

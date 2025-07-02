@@ -1,0 +1,33 @@
+﻿@{
+    ViewData["Title"] = "Новое обсуждение";
+    var classId = (Guid)ViewBag.ClassId;
+}
+
+<div class="container mt-4">
+    <div class="card shadow-sm">
+        <div class="card-header bg-success text-white">
+            <h5 class="mb-0"><i class="bi bi-plus-circle me-2"></i>Создание обсуждения</h5>
+        </div>
+        <div class="card-body">
+            <form method="post" asp-action="Create">
+                <input type="hidden" name="classId" value="@classId" />
+
+                <div class="mb-3">
+                    <label class="form-label">Тема обсуждения</label>
+                    <input type="text" name="title" class="form-control" required placeholder="Например: Подготовка к контрольной" />
+                </div>
+
+                <div class="d-flex gap-2">
+                    <button type="submit" class="btn btn-success">
+                        <i class="bi bi-send"></i> Создать
+                    </button>
+                    <a asp-action="List" asp-route-classId="@classId" class="btn btn-outline-secondary">
+                        <i class="bi bi-arrow-left"></i> Назад
+                    </a>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+
+
